@@ -338,7 +338,11 @@ function startNewSession() {
         btn.disabled = true;
     });
     
-    window.showNotification('Nova sessão iniciada', 'info');
+    if (typeof window.showNotification === 'function') {
+        window.showNotification('Nova sessão iniciada', 'info');
+    } else {
+        console.log('Nova sessão iniciada');
+    }
 }
 
 // Deleta uma sessão
@@ -355,7 +359,11 @@ async function deleteSession(sessionId) {
         const result = await response.json();
         
         if (result.success) {
-            window.showNotification('Sessão deletada com sucesso', 'success');
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('Sessão deletada com sucesso', 'success');
+            } else {
+                console.log('Sessão deletada com sucesso');
+            }
             
             // Se era a sessão selecionada, limpa seleção
             if (selectedSessionId === sessionId) {
@@ -369,7 +377,11 @@ async function deleteSession(sessionId) {
         }
     } catch (error) {
         console.error('Erro ao deletar sessão:', error);
-        window.showNotification(`Erro ao deletar sessão: ${error.message}`, 'error');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(`Erro ao deletar sessão: ${error.message}`, 'error');
+        } else {
+            console.error(`Erro ao deletar sessão: ${error.message}`);
+        }
     }
 }
 

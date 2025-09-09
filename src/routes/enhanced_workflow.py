@@ -252,7 +252,8 @@ def start_step2_synthesis():
                 try:
                     if massive_data_json:
                         # MODO PREFERIDO: Usa JSON massivo consolidado
-                        logger.info(f"📊 Carregado JSON massivo com {massive_data_json['consolidated_statistics']['total_data_size']} caracteres")
+                        data_size = massive_data_json.get('consolidated_statistics', {}).get('total_data_size', len(str(massive_data_json)))
+                        logger.info(f"📊 Carregado JSON massivo com {data_size} caracteres")
                         
                         # Executa síntese master com o JSON massivo
                         synthesis_result = loop.run_until_complete(

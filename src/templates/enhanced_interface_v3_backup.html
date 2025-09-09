@@ -1316,10 +1316,122 @@
             });
         }
         
+        window.startStep1 = async function() {
+            try {
+                if (!validateForm()) {
+                    showNotification('Por favor, preencha pelo menos o segmento', 'warning');
+                    return;
+                }
+                
+                const formData = getFormData();
+                
+                showProgress(true);
+                updateProgress(1, 'Iniciando coleta massiva de dados...', 10);
+                updateStepCard('step1Card', 'running');
+                
+                const response = await fetch('/api/workflow/step1/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentSessionId = result.session_id;
+                    showNotification('Etapa 1 iniciada: Coleta massiva em execução', 'success');
+                    
+                    // Monitora progresso
+                    monitorStep1Progress();
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro na Etapa 1:', error);
+                showNotification(`Erro na Etapa 1: ${error.message}`, 'error');
+                updateStepCard('step1Card', 'error');
+                showProgress(false);
+            }
+        }
+        
+        window.startStep2 = async function() {
+            try {
+                if (!currentSessionId) {
+                    showNotification('Execute a Etapa 1 primeiro', 'warning');
+                    return;
+                }
+                
+                updateProgress(2, 'Iniciando síntese com IA...', 40);
+                updateStepCard('step2Card', 'running');
+                
+                const response = await fetch('/api/workflow/step2/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Etapa 2 iniciada: IA analisando com busca ativa', 'success');
+                    monitorStep2Progress();
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro na Etapa 2:', error);
+                showNotification(`Erro na Etapa 2: ${error.message}`, 'error');
+                updateStepCard('step2Card', 'error');
+            }
+        }
+        
+        window.startStep3 = async function() {
+            try {
+                if (!currentSessionId) {
+                    showNotification('Execute as etapas anteriores primeiro', 'warning');
+                    return;
+                }
+                
+                updateProgress(3, 'Gerando 16 módulos de análise...', 70);
+                updateStepCard('step3Card', 'running');
+                
+                const response = await fetch('/api/workflow/step3/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('Etapa 3 iniciada: Gerando 16 módulos', 'success');
+                    monitorStep3Progress();
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro na Etapa 3:', error);
+                showNotification(`Erro na Etapa 3: ${error.message}`, 'error');
+                updateStepCard('step3Card', 'error');
+            }
+        }
+        
         // === FUNÇÕES DE GERENCIAMENTO DE SESSÕES ===
         
         let selectedSession = null;
-        let selectedStep = null;
 
         
         // Função auxiliar para salvar estado da sessão
